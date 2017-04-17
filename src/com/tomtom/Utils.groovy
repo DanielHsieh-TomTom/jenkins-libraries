@@ -12,7 +12,7 @@ static def getBuildConfig(jobName) {
     def buildConfig = [:]
 
     // Determine branch name
-    buildConfig['branchName'] = jobName.substring(jobName.indexOf('/') + 1)
+    buildConfig['branchName'] = URLDecoder.decode(jobName.substring(jobName.indexOf('/') + 1))
 
     // Determine test-suite and node-type
     switch (jobName.split('/')[0]) {
@@ -35,4 +35,61 @@ static def getBuildConfig(jobName) {
     }
 
     return buildConfig
+}
+
+@NonCPS
+private static def getCredentials(credentialId) {
+    def cred = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+            com.cloudbees.plugins.credentials.common.StandardUsernameCredentials.class,
+            Jenkins.instance,
+            null,
+            null
+    ).find { cred -> cred.id == credentialId };
+
+    def credentials = null
+    if (cred != null) {
+        credentials = [:]
+        credentials['username'] = cred.username
+        credentials['password'] = cred.password
+    }
+    return credentials
+}
+
+@NonCPS
+private static def getBasicAuthenticationHeaderValue(credentialId) {
+    def credentials = getCredentials(credentialId)
+
+    def headerValue = null
+    if (credentials != null) {
+        def s = credentials['username'] + ':' + credentials['password']
+        headerValue = 'Basic ' + s.bytes.encodeBase64().toString()
+    }
+    return headerValue
+}
+
+@NonCPS
+static def doHttpGetWithBasicAuthentication(urlString, credentialId) {
+    URL url = new URL(urlString);
+    URLConnection conn = url.openConnection();
+    conn.setRequestProperty("Authorization", getBasicAuthenticationHeaderValue(credentialId));
+    String line
+    StringBuilder builder = new StringBuilder();
+    def reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))
+    while ((line = reader.readLine()) != null) {
+        builder.append(line);
+    }
+    reader.close()
+    return builder.toString();
+}
+
+@NonCPS
+static def disableConcurrentBuilds() {
+    def rootJobs = ['slow-build', 'fast-build']
+    Jenkins.instance.items.stream().filter { rootJob ->
+        rootJob.name in rootJobs
+    }.each { rootJob ->
+        rootJob.items.stream().each { job ->
+            job.setConcurrentBuild(false)
+        }
+    }
 }

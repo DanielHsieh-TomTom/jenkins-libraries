@@ -76,9 +76,9 @@ class BuildTriggerManager {
         switch (branchName) {
             case ~/(develop|master|rel-[0-9]{2}\.[0-9])$/:
                 return BranchType.TOP
-            case ~/(?i)^((NAVAPP)-[0-9]+\/)?(integration|bugfix).*$/:
+            case ~/(?i)^((NAVAPP|US)-[0-9]+\/)?(integration|bugfix).*$/:
                 return BranchType.INTEGRATION
-            case ~/(?i)^(NAVAPP)-[0-9]+\/\1-[0-9].*$/:
+            case ~/(?i)^(NAVAPP|US)-[0-9]+\/\1-[0-9].*$/:
                 return BranchType.TASK
             default:
                 return null

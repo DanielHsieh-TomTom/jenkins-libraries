@@ -1,5 +1,7 @@
 package com.tomtom;
 
+import java.nio.file.Paths
+
 @NonCPS
 static def getP4Changelist(build) {
     def rawBuild = build.getRawBuild()
@@ -11,11 +13,14 @@ static def getP4Changelist(build) {
 static def getBuildConfig(jobName) {
     def buildConfig = [:]
 
+    // Determine root-job name
+    buildConfig['rootJob'] = URLDecoder.decode(jobName.substring(0, jobName.indexOf('/')))
+
     // Determine branch name
     buildConfig['branchName'] = URLDecoder.decode(jobName.substring(jobName.indexOf('/') + 1))
 
     // Determine test-suite and node-type
-    switch (jobName.split('/')[0]) {
+    switch (buildConfig['rootJob']) {
         case "fast-build":
             if (buildConfig['branchName'] == 'develop') {
                 buildConfig['testSuite'] = 'jenkins_main_fast'
@@ -92,4 +97,9 @@ static def disableConcurrentBuilds() {
             job.setConcurrentBuild(false)
         }
     }
+}
+
+@NonCPS
+static def getWorkspace(env, rootJob) {
+    return Paths.get(new File(env.WORKSPACE).getParent(), rootJob).toString()
 }

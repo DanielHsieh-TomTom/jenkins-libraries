@@ -105,3 +105,8 @@ static def disableConcurrentBuilds() {
 static def getWorkspace(env, rootJob) {
     return Paths.get(new File(env.WORKSPACE).getParent(), rootJob).toString()
 }
+
+@NonCPS
+static def getParameterOfLastSuccessfulBuild(jobName, parameter) {
+    return Jenkins.instance.getItem(jobName).getLastSuccessfulBuild().environment[parameter]
+}

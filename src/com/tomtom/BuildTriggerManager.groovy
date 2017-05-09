@@ -74,7 +74,7 @@ class BuildTriggerManager {
     @NonCPS
     private static BranchType getBranchType(String branchName) {
         switch (branchName) {
-            case ~/(develop|master|rel-[0-9]{2}\.[0-9])$/:
+            case ~/(develop|master|rel-[0-9]{2}\.[0-9]|navkit-canary)$/:
                 return BranchType.TOP
             case ~/(?i)^((NAVAPP|US)-[0-9]+\/)?(integration|bugfix).*$/:
                 return BranchType.INTEGRATION

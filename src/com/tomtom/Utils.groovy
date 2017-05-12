@@ -39,6 +39,10 @@ static def getBuildConfig(jobName) {
                 buildConfig['testSuite'] = 'jenkins_other_noasr_slow'
             }
             break;
+        case "fast-build-mobile":
+            buildConfig['nodeType'] = 'fast && nds'
+            buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
+            break;
     }
 
     return buildConfig

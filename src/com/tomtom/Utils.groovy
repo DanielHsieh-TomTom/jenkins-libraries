@@ -43,6 +43,10 @@ static def getBuildConfig(jobName) {
             buildConfig['nodeType'] = 'fast && nds'
             buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
             break;
+        case "fast-build-michi":
+            buildConfig['nodeType'] = 'fast && nds'
+            buildConfig['testSuite'] = 'jenkins_other_michi'
+            break;
     }
 
     return buildConfig

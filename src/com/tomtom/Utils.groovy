@@ -44,7 +44,7 @@ static def getBuildConfig(jobName) {
             buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
             break;
         case "fast-build-michi":
-            buildConfig['nodeType'] = 'node-18'
+            buildConfig['nodeType'] = 'slave-01'
             buildConfig['testSuite'] = 'jenkins_other_michi'
             break;
     }

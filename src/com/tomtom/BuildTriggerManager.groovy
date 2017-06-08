@@ -61,14 +61,23 @@ class BuildTriggerManager {
 
     @NonCPS
     private def getBuilds(String commit) {
-        def url = "https://bitbucket.tomtomgroup.com/rest/build-status/1.0/commits/${commit}"
-        def json = Utils.doHttpGetWithBasicAuthentication(url, 'svc_navuibuild')
-        def object = new JsonSlurper().parseText(json)
+        def buildInfoList = []
+        ROOT_JOBS.each { rootJob ->
+            Jenkins.instance.getJob(rootJob).items.each { job ->
+                def buildInfo = [rootJob, URLDecoder.decode(job.name)]
 
-        return object.values.stream().map { build ->
-            def matcher = build['url'] =~ /\/job\/(.*?)\/job\/(.*?)\//
-            [matcher[0][1], matcher[0][2]]
-        }.collect()
+                job.builds.each { build ->
+                    def buildCommit = build.actions.stream().find { action ->
+                        action instanceof jenkins.scm.api.SCMRevisionAction
+                    }.revision.hash
+
+                    if (buildCommit == commit) {
+                        buildInfoList << buildInfo
+                    }
+                }
+            }
+        }
+        return buildInfoList
     }
 
     @NonCPS

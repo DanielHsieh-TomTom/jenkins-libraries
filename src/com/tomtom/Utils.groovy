@@ -119,3 +119,8 @@ static def getWorkspace(env, rootJob) {
 static def getParameterOfLastSuccessfulBuild(jobName, parameter) {
     return Jenkins.instance.getItem(jobName).getLastSuccessfulBuild().environment[parameter]
 }
+
+@NonCPS
+static def addNodeNameToBuildSummary(nodeName, manager) {
+    manager.createSummary("computer.png").appendText("Node: ${nodeName}", false, false, false, "#333333")
+}

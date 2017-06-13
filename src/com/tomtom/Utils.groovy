@@ -23,12 +23,14 @@ static def getBuildConfig(jobName) {
     switch (buildConfig['rootJob']) {
         case "fast-build":
             buildConfig['nodeType'] = 'fast && nds'
-            if (buildConfig['branchName'] == 'develop'
-                    || buildConfig['branchName'].contains('integration-update-tools')) {
+            if (buildConfig['branchName'] == 'develop') {
                 buildConfig['testSuite'] = 'jenkins_main_fast'
                 buildConfig['nodeType'] = 'node-18'
             } else {
                 buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
+            }
+            if (buildConfig['branchName'].contains('integration-update-tools')) {
+                buildConfig['nodeType'] = 'slave-01'
             }
             break;
         case "slow-build":

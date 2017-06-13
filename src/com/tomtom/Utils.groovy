@@ -22,24 +22,25 @@ static def getBuildConfig(jobName) {
     // Determine test-suite and node-type
     switch (buildConfig['rootJob']) {
         case "fast-build":
-            buildConfig['nodeType'] = 'fast && nds'
             if (buildConfig['branchName'] == 'develop') {
                 buildConfig['testSuite'] = 'jenkins_main_fast'
-                buildConfig['nodeType'] = 'node-18'
+                buildConfig['nodeType'] = 'fast && nds && tab2'
             } else {
                 buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
-            }
-            if (buildConfig['branchName'].contains('integration-update-tools')) {
-                buildConfig['nodeType'] = 'slave-01'
+                if (buildConfig['branchName'].contains('integration-update-tools')) {
+                    buildConfig['nodeType'] = 'fast && nds && italia'
+                } else {
+                    buildConfig['nodeType'] = 'fast && nds'
+                }
             }
             break;
         case "slow-build":
-            buildConfig['nodeType'] = 'slow && nds'
             if (buildConfig['branchName'] == 'develop') {
                 buildConfig['testSuite'] = 'jenkins_main_slow'
-                buildConfig['nodeType'] = 'node-16'
+                buildConfig['nodeType'] = 'slow && nds && tab2'
             } else {
                 buildConfig['testSuite'] = 'jenkins_other_noasr_slow'
+                buildConfig['nodeType'] = 'slow && nds'
             }
             break;
         case "fast-build-mobile":
@@ -47,7 +48,7 @@ static def getBuildConfig(jobName) {
             buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
             break;
         case "fast-build-michi":
-            buildConfig['nodeType'] = 'slave-01'
+            buildConfig['nodeType'] = 'fast && nds && italia'
             buildConfig['testSuite'] = 'jenkins_other_michi'
             break;
     }
@@ -120,4 +121,9 @@ static def getWorkspace(env, rootJob) {
 @NonCPS
 static def getParameterOfLastSuccessfulBuild(jobName, parameter) {
     return Jenkins.instance.getItem(jobName).getLastSuccessfulBuild().environment[parameter]
+}
+
+@NonCPS
+static def addNodeNameToBuildSummary(nodeName, manager) {
+    manager.createSummary("computer.png").appendText("Node: ${nodeName}", false, false, false, "#333333")
 }

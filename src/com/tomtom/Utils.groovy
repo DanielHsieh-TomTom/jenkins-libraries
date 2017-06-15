@@ -22,34 +22,41 @@ static def getBuildConfig(jobName) {
     // Determine test-suite and node-type
     switch (buildConfig['rootJob']) {
         case "fast-build":
+            buildConfig['testSuite'] = 'jenkins_fast'
+            buildConfig['nodeType'] = 'fast && nds'
             if (buildConfig['branchName'] == 'develop') {
-                buildConfig['testSuite'] = 'jenkins_main_fast'
                 buildConfig['nodeType'] = 'fast && nds && tab2'
-            } else {
-                buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
-                if (buildConfig['branchName'].contains('integration-update-tools')) {
-                    buildConfig['nodeType'] = 'fast && nds && italia'
-                } else {
-                    buildConfig['nodeType'] = 'fast && nds'
-                }
             }
             break;
         case "slow-build":
+            buildConfig['testSuite'] = 'jenkins_slow'
+            buildConfig['nodeType'] = 'slow && nds'
             if (buildConfig['branchName'] == 'develop') {
-                buildConfig['testSuite'] = 'jenkins_main_slow'
                 buildConfig['nodeType'] = 'slow && nds && tab2'
-            } else {
-                buildConfig['testSuite'] = 'jenkins_other_noasr_slow'
-                buildConfig['nodeType'] = 'slow && nds'
             }
             break;
-        case "fast-build-mobile":
-            buildConfig['nodeType'] = 'fast && nds'
-            buildConfig['testSuite'] = 'jenkins_other_noasr_fast'
+
+        case "fast-build-asr":
+            buildConfig['testSuite'] = 'jenkins_asr_fast'
+            buildConfig['nodeType'] = 'asr'
             break;
+        case "slow-build-asr":
+            buildConfig['testSuite'] = 'jenkins_asr_slow'
+            buildConfig['nodeType'] = 'asr'
+            break;
+
         case "fast-build-michi":
+            buildConfig['testSuite'] = 'jenkins_michi_fast'
             buildConfig['nodeType'] = 'fast && nds && italia'
-            buildConfig['testSuite'] = 'jenkins_other_michi'
+            break;
+        case "slow-build-michi":
+            buildConfig['testSuite'] = 'jenkins_michi_slow'
+            buildConfig['nodeType'] = 'slow && nds && italia'
+            break;
+
+        case "fast-build-mobile":
+            buildConfig['testSuite'] = 'jenkins_fast'
+            buildConfig['nodeType'] = 'fast && nds'
             break;
     }
 

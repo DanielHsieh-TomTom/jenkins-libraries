@@ -25,14 +25,14 @@ static def getBuildConfig(jobName) {
             buildConfig['testSuite'] = 'jenkins_fast'
             buildConfig['nodeType'] = 'fast && nds'
             if (buildConfig['branchName'] == 'develop') {
-                buildConfig['nodeType'] = 'fast && nds && tab2'
+                buildConfig['nodeType'] = 'fast && nds && italia'
             }
             break;
         case "slow-build":
             buildConfig['testSuite'] = 'jenkins_slow'
             buildConfig['nodeType'] = 'slow && nds'
             if (buildConfig['branchName'] == 'develop') {
-                buildConfig['nodeType'] = 'slow && nds && tab2'
+                buildConfig['nodeType'] = 'slow && nds && italia'
             }
             break;
 

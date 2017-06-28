@@ -67,12 +67,15 @@ class BuildTriggerManager {
                 def buildInfo = [rootJob, URLDecoder.decode(job.name)]
 
                 job.builds.each { build ->
-                    def buildCommit = build.actions.stream().find { action ->
+                    def scmAction = build.actions.stream().find { action ->
                         action instanceof jenkins.scm.api.SCMRevisionAction
-                    }.revision.hash
+                    }
+                    if (scmAction != null) {
+                        def buildCommit = scmAction.revision.hash
 
-                    if (buildCommit == commit) {
-                        buildInfoList << buildInfo
+                        if (buildCommit == commit) {
+                            buildInfoList << buildInfo
+                        }
                     }
                 }
             }

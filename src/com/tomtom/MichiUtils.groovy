@@ -4,7 +4,12 @@ import groovy.json.JsonSlurper
 
 @NonCPS
 static def getArtifactUrls(version) {
-    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/main-michi-android/api/json").text)
+    return getArtifactUrlsForJob("main-michi-android", version)
+}
+
+@NonCPS
+static def getArtifactUrlsForJob(jobName, version) {
+    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/${jobName}/api/json").text)
     def versionPattern = "^Michi: CL#${version}, NavKit: .*\$"
     def matrixBuild = jobJson.builds.stream().map { build ->
       new JsonSlurper().parseText(new URL("${build.url}/api/json").text)
@@ -33,7 +38,12 @@ static def getArtifactUrls(version) {
 
 @NonCPS
 static def getLastSuccessfulVersion() {
-    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/main-michi-android/api/json").text)
+    return getLastSuccessfulVersionForJob("main-michi-android")
+}
+
+@NonCPS
+static def getLastSuccessfulVersionForJob(jobName) {
+    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/${jobName}/api/json").text)
     def lastSuccessfulBuildJson = new JsonSlurper().parseText(new URL("${jobJson.lastSuccessfulBuild.url}/api/json").text)
 
     def matcher = lastSuccessfulBuildJson.description =~ /^Michi: CL#([0-9]+), NavKit: (.*)$/

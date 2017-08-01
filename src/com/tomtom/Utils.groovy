@@ -11,6 +11,11 @@ static def getP4Changelist(build) {
 
 @NonCPS
 static def getBuildConfig(jobName) {
+    return getBuildConfig(jobName, 0)
+}
+
+@NonCPS
+static def getBuildConfig(jobName, supportedNodeVersion) {
     def buildConfig = [:]
 
     // Determine root-job name
@@ -59,6 +64,9 @@ static def getBuildConfig(jobName) {
             buildConfig['nodeType'] = 'fast && nds'
             break;
     }
+
+    // Request a supported node-version
+    buildConfig['nodeType'] += " && nodeVersion-${supportedNodeVersion}"
 
     return buildConfig
 }

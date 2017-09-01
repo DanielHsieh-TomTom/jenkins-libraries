@@ -10,6 +10,18 @@ static def getP4Changelist(build) {
 }
 
 @NonCPS
+static def getRevisionHashes(build) {
+    def hashes = []
+    def scmAction = build.getRawBuild().actions.stream().find { action ->
+        action instanceof jenkins.scm.api.SCMRevisionAction
+    }
+    if (scmAction != null) {
+        hashes += scmAction.revision.hash
+    }
+    return hashes
+}
+
+@NonCPS
 static def getBuildConfig(jobName) {
     return getBuildConfig(jobName, 0)
 }

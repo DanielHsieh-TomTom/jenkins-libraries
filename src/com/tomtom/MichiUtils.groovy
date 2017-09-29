@@ -26,9 +26,9 @@ static def getArtifactUrlsForJob(jobName, version) {
 
     def buildJson = new JsonSlurper().parseText(new URL("${build.url}/api/json").text)
     buildJson.artifacts.stream().each { artifact ->
-      if (artifact.fileName == 'TomTomNavKitMapSdk.aar') {
+      if (artifact.fileName == 'TomTomNavKitMapSdk.aar' || artifact.fileName == 'TomTomNavKitMapSdk-release.aar') {
         aarUrl = "${build.url}artifact/${artifact.relativePath}"
-      } else if (artifact.fileName == 'TomTomNavKitMapReferenceApp.apk') {
+      } else if (artifact.fileName == 'TomTomNavKitMapReferenceApp.apk' || artifact.fileName == 'TomTomNavKitMapReferenceApp-release.apk') {
         apkUrl = "${build.url}artifact/${artifact.relativePath}"
       }
     }

@@ -55,7 +55,7 @@ static def getLastSuccessfulVersionForJob(jobName) {
 
 @NonCPS
 static def doesVersionExist(version) {
-    URL url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.michi&a=TomTomNavKitMapSdk")
+    URL url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.navui.michi&a=TomTomNavKitMapSdk")
 
     def found = new JsonSlurper().parseText(url.text).results.find { result ->
       result.version == version

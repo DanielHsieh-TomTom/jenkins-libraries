@@ -99,22 +99,29 @@ class BuildTriggerManager {
     }
 
     @NonCPS
-    private boolean hasSuitableBuild(String commit, String branchName, JobType jobType) {
+    private int getNumberOfSuitableBuilds(String commit, String branchName, JobType jobType) {
         def builds = getBuilds(commit)
         boolean requiresExactMatch = getBranchType(branchName).requiresOwnBuilds
 
-        boolean buildFound = false
+        int nrOfBuilds = 0
         builds.each { buildInfo ->
             def buildJobType = JobType.fromJobName(buildInfo[0])
             def buildBranchName = buildInfo[1]
 
-            if (buildJobType == jobType) {
-                buildFound = !requiresExactMatch || buildBranchName == branchName
+            if (buildJobType == jobType && (!requiresExactMatch || buildBranchName == branchName)) {
+                nrOfBuilds++
             }
         }
-        return buildFound
+        return nrOfBuilds
     }
 
+    @NonCPS
+    private int getNumberOfRequiredBuilds(String branchName, JobType jobType) {
+        if (branchName == 'navkit-canary' && jobType == JobType.SLOW) {
+            return 2
+        }
+        return 1
+    }
 
     @NonCPS
     def triggerRequiredBuilds(currentBuild) {
@@ -161,20 +168,24 @@ class BuildTriggerManager {
 
                 branchType.jobTypes.each { jobType ->
                     final boolean alreadyTriggered = jobType in existingJobTypes
-                    final boolean hasSuitableBuild = hasSuitableBuild(commit, branchName, jobType)
-                    def job = Jenkins.instance.getItem(jobType.jobName).getItem(branchName)
+                    final int numberOfSuitableBuilds = getNumberOfSuitableBuilds(commit, branchName, jobType)
+                    final int numberOfRequiredBuilds = getNumberOfRequiredBuilds(branchName, jobType)
+                    final boolean hasEnoughSuitableBuilds = numberOfSuitableBuilds >= numberOfRequiredBuilds
+                    final def job = Jenkins.instance.getItem(jobType.jobName).getItem(branchName)
 
                     log += "    {\n"
                     log += "      Job: ${job.fullName},\n"
                     log += "      JobType: ${jobType},\n"
                     log += "      RequiresOwnBuilds: ${branchType.requiresOwnBuilds},\n"
-                    log += "      HasSuitableBuild: ${hasSuitableBuild},\n"
+                    log += "      NumberOfSuitableBuilds: ${numberOfSuitableBuilds},\n"
+                    log += "      NumberOfRequiredBuilds: ${numberOfRequiredBuilds},\n"
+                    log += "      HasEnoughSuitableBuilds: ${hasEnoughSuitableBuilds},\n"
                     log += "      AlreadyTriggered: ${alreadyTriggered},\n"
                     log += "      Building: ${job.isBuilding()},\n"
                     log += "      InQueue: ${job.isInQueue()},\n"
 
                     boolean trigger = false
-                    if (!hasSuitableBuild && (!alreadyTriggered || branchType.requiresOwnBuilds)) {
+                    if (!hasEnoughSuitableBuilds && (!alreadyTriggered || branchType.requiresOwnBuilds)) {
                         if (!job.isBuilding() && !job.isInQueue()) {
                             trigger = true
                         }

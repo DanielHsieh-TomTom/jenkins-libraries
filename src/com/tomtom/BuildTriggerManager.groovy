@@ -4,10 +4,10 @@ import groovy.json.JsonSlurper
 
 class BuildTriggerManager {
 
-    final ROOT_JOBS = ['slow-build', 'fast-build', 'fast-build-michi']
+    final ROOT_JOBS = ['slow-build', 'fast-build']
 
     enum BranchType {
-        TOP(0, true, JobType.SLOW, JobType.FAST, JobType.FAST_MICHI),
+        TOP(0, true, JobType.SLOW, JobType.FAST),
         INTEGRATION(1, false, JobType.FAST),
         TASK(2, false, JobType.FAST)
 
@@ -24,8 +24,7 @@ class BuildTriggerManager {
 
     enum JobType {
         FAST('fast-build'),
-        SLOW('slow-build'),
-        FAST_MICHI('fast-build-michi')
+        SLOW('slow-build')
 
         static Map<String, JobType> sMap = new HashMap<>()
         static {

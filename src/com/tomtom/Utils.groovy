@@ -70,11 +70,6 @@ static def getBuildConfig(jobName, supportedNodeVersion) {
             buildConfig['testSuite'] = 'jenkins_michi_slow'
             buildConfig['nodeType'] = 'slow && nds && italia'
             break;
-
-        case "fast-build-mobile":
-            buildConfig['testSuite'] = 'jenkins_fast'
-            buildConfig['nodeType'] = 'fast && nds'
-            break;
     }
 
     // Request a supported node-version

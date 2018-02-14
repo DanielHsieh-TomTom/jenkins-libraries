@@ -3,54 +3,23 @@ package com.tomtom;
 import groovy.json.JsonSlurper
 
 @NonCPS
-static def getArtifactUrls(version) {
-    return getArtifactUrlsForJob("main-michi-android", version)
-}
+static def getLatestVersion(versionPattern) {
+    def searchUrl = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/artifact?repos=michi-release-local&name=TomTom.NavKit.Map.Sdk.Android.aar")
+    def searchJson = new JsonSlurper().parseText(searchUrl.text)
 
-@NonCPS
-static def getArtifactUrlsForJob(jobName, version) {
-    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/${jobName}/api/json").text)
-    def versionPattern = "^Michi: CL#${version}, NavKit: .*\$"
-    def matrixBuild = jobJson.builds.stream().map { build ->
-      new JsonSlurper().parseText(new URL("${build.url}/api/json").text)
-    }.find { build ->
-      build.description ==~ /${versionPattern}/
-    }
+    def artifactFileNamePrefix = "TomTom.NavKit.Map.Sdk.Android.aar-android-armeabi-v7a-release-custom-"
 
-    def build = matrixBuild.runs.stream().find { build ->
-      build.url.contains('MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=ubuntu_host')
-    }
+    def versions = searchJson.results.stream()
+        .filter { it.uri.contains(artifactFileNamePrefix) }
+        .map {
+            def uri = it.uri
+            def startIndex = uri.lastIndexOf(artifactFileNamePrefix) + artifactFileNamePrefix.length()
+            def endIndex = uri.size() - 4
+            uri.substring(startIndex, endIndex)
+        }.filter { it ==~ /${versionPattern}/ }
+    .collect().sort { (it =~ /${versionPattern}/)[0][1] }.reverse()
 
-    def aarUrl = null
-    def apkUrl = null
-
-    def buildJson = new JsonSlurper().parseText(new URL("${build.url}/api/json").text)
-    buildJson.artifacts.stream().each { artifact ->
-      if (artifact.fileName == 'TomTomNavKitMapSdk.aar' || artifact.fileName == 'TomTomNavKitMapSdk-release.aar') {
-        aarUrl = "${build.url}artifact/${artifact.relativePath}"
-      } else if (artifact.fileName == 'TomTomNavKitMapReferenceApp.apk' || artifact.fileName == 'TomTomNavKitMapReferenceApp-release.apk') {
-        apkUrl = "${build.url}artifact/${artifact.relativePath}"
-      }
-    }
-
-    return [aarUrl, apkUrl]
-}
-
-@NonCPS
-static def getLastSuccessfulVersion() {
-    return getLastSuccessfulVersionForJob("main-michi-android")
-}
-
-@NonCPS
-static def getLastSuccessfulVersionForJob(jobName) {
-    def jobJson = new JsonSlurper().parseText(new URL("http://michi-infinity.tomtomgroup.com:8080/job/${jobName}/api/json").text)
-    def lastSuccessfulBuildJson = new JsonSlurper().parseText(new URL("${jobJson.lastSuccessfulBuild.url}/api/json").text)
-
-    def matcher = lastSuccessfulBuildJson.description =~ /^Michi: CL#([0-9]+), NavKit: (.*)$/
-    if (matcher.size() > 0) {
-        return matcher[0][1]
-    }
-    return null
+    return (versions.isEmpty()) ? null : versions[0]
 }
 
 @NonCPS

@@ -30,35 +30,36 @@ private static def getNavKitVersions(architecture) {
     def jsonSlurper = new JsonSlurper()
     def json = jsonSlurper.parseText(connection.content.text)
 
-    return json.results.sort {
-            -Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", it.created).getTime()
-        }.stream().map {
+    return json.results.stream().map {
             it.path.substring(it.path.lastIndexOf("/") + 1)
         }.collect()
 }
 
 @NonCPS
-static def getNavKitVersion(branch) {
-    def versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)\$"
+static def getLatestNavKitVersion(branch) {
+    def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
+
+    // Determine architecture and version pattern
     def architecture = "x86_64"
+    def versionPattern = ""
     switch (branch) {
         case "main":
-            // Use defaults
+            versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)\$"
             break;
         case "rel-17.6":
-            versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)-17\\.6\$"
-            architecture = "armeabi-v7a"
+            architecture = "armeabi_v7a"
+            // fall-through
+        case ~/$releaseBranchPattern/:
+            def matcher = branch =~ /$releaseBranchPattern/
+            versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)-${matcher[0][1]}\\.${matcher[0][2]}\$"
             break;
-        case "rel-18.1":
-            versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)-18\\.1\$"
-            break;
-        default:
-            return null;
     }
 
+    // Get all versions
     def versions = getNavKitVersions(architecture)
 
-    def sortedVersion = versions.stream()
+    // Sort versions based on pattern
+    def sortedVersions = versions.stream()
         .filter { it ==~ versionPattern }
         .collect().sort { l, r ->
             def lArray = (l =~ versionPattern)[0][1].split(/\./)
@@ -75,7 +76,7 @@ static def getNavKitVersion(branch) {
             return 0
         }
 
-    return sortedVersion.last()
+    return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
 }
 
 @NonCPS

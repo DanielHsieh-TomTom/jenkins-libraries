@@ -172,30 +172,34 @@ class BuildTriggerManager {
                     final boolean hasEnoughSuitableBuilds = numberOfSuitableBuilds >= numberOfRequiredBuilds
                     final def job = Jenkins.instance.getItem(jobType.jobName).getItem(branchName)
 
-                    log += "    {\n"
-                    log += "      Job: ${job.fullName},\n"
-                    log += "      JobType: ${jobType},\n"
-                    log += "      RequiresOwnBuilds: ${branchType.requiresOwnBuilds},\n"
-                    log += "      NumberOfSuitableBuilds: ${numberOfSuitableBuilds},\n"
-                    log += "      NumberOfRequiredBuilds: ${numberOfRequiredBuilds},\n"
-                    log += "      HasEnoughSuitableBuilds: ${hasEnoughSuitableBuilds},\n"
-                    log += "      AlreadyTriggered: ${alreadyTriggered},\n"
-                    log += "      Building: ${job.isBuilding()},\n"
-                    log += "      InQueue: ${job.isInQueue()},\n"
+                    if (job != null) {
+                        log += "    {\n"
+                        log += "      Job: ${job.fullName},\n"
+                        log += "      JobType: ${jobType},\n"
+                        log += "      RequiresOwnBuilds: ${branchType.requiresOwnBuilds},\n"
+                        log += "      NumberOfSuitableBuilds: ${numberOfSuitableBuilds},\n"
+                        log += "      NumberOfRequiredBuilds: ${numberOfRequiredBuilds},\n"
+                        log += "      HasEnoughSuitableBuilds: ${hasEnoughSuitableBuilds},\n"
+                        log += "      AlreadyTriggered: ${alreadyTriggered},\n"
+                        log += "      Building: ${job.isBuilding()},\n"
+                        log += "      InQueue: ${job.isInQueue()},\n"
 
-                    boolean trigger = false
-                    if (!hasEnoughSuitableBuilds && (!alreadyTriggered || branchType.requiresOwnBuilds)) {
-                        if (!job.isBuilding() && !job.isInQueue()) {
-                            trigger = true
+                        boolean trigger = false
+                        if (!hasEnoughSuitableBuilds && (!alreadyTriggered || branchType.requiresOwnBuilds)) {
+                            if (!job.isBuilding() && !job.isInQueue()) {
+                                trigger = true
+                            }
+                            existingJobTypes << jobType
                         }
-                        existingJobTypes << jobType
-                    }
 
-                    log += "      Triggering: ${trigger}\n"
-                    log += "    },\n"
+                        log += "      Triggering: ${trigger}\n"
+                        log += "    },\n"
 
-                    if (trigger) {
-                        job.scheduleBuild(new Cause.UpstreamCause(currentBuild.build()))
+                        if (trigger) {
+                            job.scheduleBuild(new Cause.UpstreamCause(currentBuild.build()))
+                        }
+                    } else {
+                        log += "[WARN] Unable to get job for name '${jobType.jobName}'"
                     }
                 }
                 log += "  ]\n"

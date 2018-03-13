@@ -36,7 +36,7 @@ private static def getNavKitVersions(architecture) {
 }
 
 @NonCPS
-static def getLatestNavKitVersion(branch) {
+static def getLatestVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
     // Determine architecture and version pattern

@@ -1,6 +1,8 @@
 package com.tomtom;
 
 import java.nio.file.Paths
+import hudson.BulkChange;
+import hudson.tasks.LogRotator;
 
 @NonCPS
 static def getP4Changelist(build) {
@@ -124,14 +126,62 @@ static def doHttpGetWithBasicAuthentication(urlString, credentialId) {
 }
 
 @NonCPS
-static def disableConcurrentBuilds() {
-    def rootJobs = ['slow-build', 'fast-build']
+static def fixMultiBranchJobProperties() {
+    def rootJobs = ['slow-build', 'fast-build', 'fast-build-asr']
     Jenkins.instance.items.stream().filter { rootJob ->
         rootJob.name in rootJobs
     }.each { rootJob ->
         rootJob.items.stream().each { job ->
+            // Disable concurrent builds
             job.setConcurrentBuild(false)
+
+            // Configure the build retention
+            configureBuildRetention(job)
         }
+    }
+}
+
+@NonCPS
+private static def configureBuildRetention(job) {
+    def setStrategy = true
+    def daysToKeep = -1
+    def numToKeep = 10
+    def artifactDaysToKeep = -1
+    def artifactNumToKeep = -1
+
+    def branchName = URLDecoder.decode(job.name)
+    switch (branchName) {
+        case "develop":
+            // Keep develop builds for 100 days
+            daysToKeep = 100
+            numToKeep = -1
+            break
+        case ~/rel-[0-9]{2}\.[0-9]/:
+            // Keep all builds for release branches
+            setStrategy = false
+            break;
+        case "navkit-canary":
+            // Keep 100 builds for the canary branch
+            numToKeep = 100
+            break;
+        default:
+            break;
+    }
+
+    BulkChange bc = new BulkChange(job);
+    try {
+        def propertyExists = job.getProperty(BuildDiscarderProperty.class) != null
+        if (propertyExists) {
+            job.removeProperty(BuildDiscarderProperty.class)
+        }
+        if (setStrategy) {
+            def strategy = new LogRotator(daysToKeep, numToKeep, artifactDaysToKeep, artifactNumToKeep)
+            job.addProperty(new BuildDiscarderProperty(strategy))
+        }
+
+        bc.commit();
+    } finally {
+        bc.abort();
     }
 }
 

@@ -3,36 +3,46 @@ package com.tomtom;
 import groovy.json.JsonSlurper
 
 @NonCPS
-private static def getNavKitVersions(architecture) {
+private static def getNavKitVersions(architectures) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
     def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
 
-    def path = "com.tomtom/NavKit.FOR.NDS/android/${architecture}/release/*"
-    def name = "NavKit.FOR.NDS-android-${architecture}-release-lib-*"
+    def versionLists = architectures.stream().map { architecture ->
+        def path = "com.tomtom/NavKit.FOR.NDS/android/${architecture}/release/*"
+        def name = "NavKit.FOR.NDS-android-${architecture}-release-lib-*"
 
-    def body = """items.find({
-        "repo": {"\$eq":"navkit-release-local"},
-        "path": {"\$match":"$path"},
-        "name": {"\$match":"$name"}
-    })"""
+        def body = """items.find({
+"repo": {"\$eq":"navkit-release-local"},
+"path": {"\$match":"$path"},
+"name": {"\$match":"$name"}
+})"""
 
-    def connection = url.openConnection()
-    connection.setRequestMethod("POST")
-    connection.setRequestProperty("Authorization", authorization)
-    connection.doOutput = true
+        def connection = url.openConnection()
+        connection.setRequestMethod("POST")
+        connection.setRequestProperty("Authorization", authorization)
+        connection.doOutput = true
 
-    def writer = new OutputStreamWriter(connection.outputStream)
-    writer.write(body)
-    writer.flush()
-    writer.close()
-    connection.connect()
+        def writer = new OutputStreamWriter(connection.outputStream)
+        writer.write(body)
+        writer.flush()
+        writer.close()
+        connection.connect()
 
-    def jsonSlurper = new JsonSlurper()
-    def json = jsonSlurper.parseText(connection.content.text)
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(connection.content.text)
 
-    return json.results.stream().map {
+        json.results.stream().map {
             it.path.substring(it.path.lastIndexOf("/") + 1)
         }.collect()
+    }.collect()
+
+    return versionLists[0].stream().filter {
+        def exists = true
+        for (def i = 1;i<versionLists.size;i++) {
+            exists = exists && versionLists[i].contains(it)
+        }
+        exists
+    }.collect()
 }
 
 @NonCPS
@@ -40,14 +50,14 @@ static def getLatestVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
     // Determine architecture and version pattern
-    def architecture = "x86_64"
+    def architectures = ["armeabi_v7a", "x86_64"]
     def versionPattern = ""
     switch (branch) {
         case "main":
             versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)\$"
             break;
         case "rel-17.6":
-            architecture = "armeabi_v7a"
+            architectures = ["armeabi_v7a"]
             // fall-through
         case ~/$releaseBranchPattern/:
             def matcher = branch =~ /$releaseBranchPattern/
@@ -56,7 +66,7 @@ static def getLatestVersion(branch) {
     }
 
     // Get all versions
-    def versions = getNavKitVersions(architecture)
+    def versions = getNavKitVersions(architectures)
 
     // Sort versions based on pattern
     def sortedVersions = versions.stream()

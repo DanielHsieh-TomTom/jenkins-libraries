@@ -54,6 +54,7 @@ static def getLatestVersion(branch) {
     def versionPattern = ""
     switch (branch) {
         case "main":
+            architectures = ["armeabi_v7a"] // NavKit doesn't reliably provide x86_64 for the mainline
             versionPattern = "^([0-9]+)\$"
             break;
         case "rel-17.6":

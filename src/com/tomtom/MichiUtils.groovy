@@ -1,6 +1,20 @@
 package com.tomtom;
 
 import groovy.json.JsonSlurper
+import org.apache.http.HttpResponse
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.conn.ssl.TrustStrategy
+import org.apache.http.util.EntityUtils
+import org.apache.http.conn.ssl.SSLContextBuilder
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.impl.client.HttpClients
+import java.security.cert.CertificateException
+import java.security.cert.X509Certificate
+import java.util.stream.Collectors
+
+import javax.net.ssl.X509TrustManager
+import javax.net.ssl.SSLContext
+import javax.net.ssl.HttpsURLConnection
 
 @NonCPS
 private static def getMichiVersions(architectures) {
@@ -87,4 +101,43 @@ static def doesVersionExist(version) {
     } != null
 
     return found
+}
+
+@NonCPS
+private def parseMichiBuilds(content) {
+    def jsonSlurper = new JsonSlurper()
+    def json = jsonSlurper.parseText(content)
+
+    def pattern = /^Michi: CL#([0-9]+), NavKit: ([0-9]+\.[0-9]+\.[0-9]+)$/
+
+    return json.builds.stream().map {
+        it.description
+    }.filter {
+        it ==~ pattern
+    }.map {
+        def matcher = it =~ pattern
+        new Tuple2(matcher[0][1].toInteger(), matcher[0][2])
+    }.collect().collectEntries {
+        [(it.first): it.second]
+    }
+}
+
+def getNavKitVersion(branch, michiVersion) {
+    def jobName = ""
+    switch (branch) {
+        case "main":
+            jobName = "main-michi-android"
+            break;
+        case "rel-18.1":
+            jobName = "rel-18.1-michi-android"
+            break;
+        default:
+            return null
+    }
+
+    def response = httpRequest(url: "https://michi-infinity.tomtomgroup.com/job/${jobName}/MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=ubuntu_host/api/json?tree=builds[description]", ignoreSslErrors: true)
+    def content = response.content
+
+    def michiNavKitVersionMap = parseMichiBuilds(content)
+    return michiNavKitVersionMap[michiVersion as Integer]
 }

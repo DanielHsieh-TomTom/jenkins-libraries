@@ -139,5 +139,5 @@ def getNavKitVersion(branch, michiVersion) {
     def content = response.content
 
     def michiNavKitVersionMap = parseMichiBuilds(content)
-    return michiNavKitVersionMap[michiVersion as Integer]
+    return michiNavKitVersionMap["$michiVersion"]
 }

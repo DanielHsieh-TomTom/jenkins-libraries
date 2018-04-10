@@ -123,13 +123,15 @@ private def parseMichiBuilds(content) {
 }
 
 def getNavKitVersion(branch, michiVersion) {
+    def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
     def jobName = ""
     switch (branch) {
         case "main":
             jobName = "main-michi-android"
             break;
-        case "rel-18.1":
-            jobName = "rel-18.1-michi-android"
+        case ~/$releaseBranchPattern/:
+            def matcher = branch =~ /$releaseBranchPattern/
+            jobName = "rel-${matcher[0][1]}.${matcher[0][2]}-michi-android"
             break;
         default:
             return null

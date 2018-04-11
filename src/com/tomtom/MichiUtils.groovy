@@ -108,7 +108,7 @@ private def parseMichiBuilds(content) {
     def jsonSlurper = new JsonSlurper()
     def json = jsonSlurper.parseText(content)
 
-    def pattern = /^Michi: CL#([0-9]+), NavKit: ([0-9]+\.[0-9]+\.[0-9]+)$/
+    def pattern = /^Michi: CL#([0-9]+), NavKit: (.*)$/
 
     return json.builds.stream().map {
         it.description
@@ -116,7 +116,7 @@ private def parseMichiBuilds(content) {
         it ==~ pattern
     }.map {
         def matcher = it =~ pattern
-        new Tuple2(matcher[0][1].toInteger(), matcher[0][2])
+        new Tuple2(matcher[0][1], matcher[0][2])
     }.collect().collectEntries {
         [(it.first): it.second]
     }
@@ -141,5 +141,5 @@ def getNavKitVersion(branch, michiVersion) {
     def content = response.content
 
     def michiNavKitVersionMap = parseMichiBuilds(content)
-    return michiNavKitVersionMap["$michiVersion"]
+    return michiNavKitVersionMap["$michiVersion".take(7)]
 }

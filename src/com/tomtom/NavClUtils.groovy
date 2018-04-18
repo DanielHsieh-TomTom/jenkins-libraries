@@ -20,6 +20,7 @@ private static def getNavClVersions(architectures) {
         def connection = url.openConnection()
         connection.setRequestMethod("POST")
         connection.setRequestProperty("Authorization", authorization)
+        connection.setRequestProperty("Content-Type", "text/plain")
         connection.doOutput = true
 
         def writer = new OutputStreamWriter(connection.outputStream)

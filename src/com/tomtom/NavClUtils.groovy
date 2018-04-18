@@ -50,7 +50,7 @@ private static def getNavClVersions(architectures) {
 static def getLatestVersion(branch) {
     def nightlyPattern = /^nightly_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
 
-    def architectures = ['armeabi_v7a']
+    def architectures = ['armeabi-v7a']
     def versions = getNavClVersions(architectures)
 
     def sortedVersions = []

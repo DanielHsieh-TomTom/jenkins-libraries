@@ -51,14 +51,14 @@ static def getLatestVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
     // Determine architecture and version pattern
-    def architectures = ["armeabi_v7a", "x86_64"]
+    def architectures = ["armeabi-v7a", "x86_64"]
     def versionPattern = ""
     switch (branch) {
         case "main":
             versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)\$"
             break;
         case "rel-17.6":
-            architectures = ["armeabi_v7a"]
+            architectures = ["armeabi-v7a"]
             // fall-through
         case ~/$releaseBranchPattern/:
             def matcher = branch =~ /$releaseBranchPattern/

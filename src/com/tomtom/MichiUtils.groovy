@@ -65,15 +65,15 @@ static def getLatestVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
     // Determine architectures and version pattern
-    def architectures = ["armeabi_v7a", "x86_64"]
+    def architectures = ["armeabi-v7a", "x86_64"]
     def versionPattern = ""
     switch (branch) {
         case "main":
-            architectures = ["armeabi_v7a"] // NavKit doesn't reliably provide x86_64 for the mainline
+            architectures = ["armeabi-v7a"] // NavKit doesn't reliably provide x86_64 for the mainline
             versionPattern = "^([0-9]+)\$"
             break;
         case "rel-17.6":
-            architectures = ["armeabi_v7a"]
+            architectures = ["armeabi-v7a"]
             versionPattern = "^rel-17\\.6-([0-9]+)\$"
             break;
         case ~/$releaseBranchPattern/:

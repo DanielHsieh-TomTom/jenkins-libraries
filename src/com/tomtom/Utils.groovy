@@ -185,3 +185,8 @@ static def getParameterOfLastSuccessfulBuild(jobName, parameter) {
 static def addNodeNameToBuildSummary(nodeName, manager) {
     manager.createSummary("computer.png").appendText("Node: ${nodeName}", false, false, false, "#333333")
 }
+
+@NonCPS
+static def addArtifactLink(manager, label, artifactLink, artifactName) {
+    manager.createSummary("clipboard.png").appendText("${label}: <a href=\"${artifactLink}\" target=\"_blank\">${artifactName}</a>", false, false, false, "#333333")
+}

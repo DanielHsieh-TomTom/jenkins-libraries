@@ -25,11 +25,6 @@ static def getRevisionHashes(build) {
 
 @NonCPS
 static def getBuildConfig(jobName) {
-    return getBuildConfig(jobName, 0)
-}
-
-@NonCPS
-static def getBuildConfig(jobName, supportedNodeVersion) {
     def buildConfig = [:]
 
     // Determine root-job name
@@ -42,17 +37,11 @@ static def getBuildConfig(jobName, supportedNodeVersion) {
     switch (buildConfig['rootJob']) {
         case "fast-build":
             buildConfig['testSuite'] = 'jenkins_fast'
-            buildConfig['nodeType'] = 'fast && nds'
-            if (buildConfig['branchName'] == 'develop' || buildConfig['branchName'] == 'navkit-canary') {
-                buildConfig['nodeType'] = 'fast && nds && italia'
-            }
+            buildConfig['nodeType'] = 'fast && italia'
             break;
         case "slow-build":
             buildConfig['testSuite'] = 'jenkins_slow'
-            buildConfig['nodeType'] = 'slow && nds'
-            if (buildConfig['branchName'] == 'develop' || buildConfig['branchName'] == 'navkit-canary') {
-                buildConfig['nodeType'] = 'slow && nds && italia'
-            }
+            buildConfig['nodeType'] = 'slow && italia'
             break;
 
         case "fast-build-asr":
@@ -66,16 +55,13 @@ static def getBuildConfig(jobName, supportedNodeVersion) {
 
         case "fast-build-michi":
             buildConfig['testSuite'] = 'jenkins_michi_fast'
-            buildConfig['nodeType'] = 'fast && nds && italia'
+            buildConfig['nodeType'] = 'fast && italia'
             break;
         case "slow-build-michi":
             buildConfig['testSuite'] = 'jenkins_michi_slow'
-            buildConfig['nodeType'] = 'slow && nds && italia'
+            buildConfig['nodeType'] = 'slow && italia'
             break;
     }
-
-    // Request a supported node-version
-    buildConfig['nodeType'] += " && nodeVersion-${supportedNodeVersion}"
 
     return buildConfig
 }

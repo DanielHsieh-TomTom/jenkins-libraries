@@ -138,8 +138,8 @@ private static def configureBuildRetention(job) {
     def branchName = URLDecoder.decode(job.name)
     switch (branchName) {
         case "develop":
-            // Keep develop builds for 100 days
-            daysToKeep = 100
+            // Keep develop builds for 365 days
+            daysToKeep = 365
             numToKeep = -1
             break
         case ~/rel-[0-9]{2}\.[0-9]/:
@@ -147,8 +147,8 @@ private static def configureBuildRetention(job) {
             setStrategy = false
             break;
         case "navkit-canary":
-            // Keep 100 builds for the canary branch
-            numToKeep = 100
+            // Keep 365 builds for the canary branch
+            numToKeep = 365
             break;
         default:
             break;

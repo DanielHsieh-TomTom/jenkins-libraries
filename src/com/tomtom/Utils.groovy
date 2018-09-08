@@ -37,11 +37,11 @@ static def getBuildConfig(jobName) {
     switch (buildConfig['rootJob']) {
         case "fast-build":
             buildConfig['testSuite'] = 'jenkins_fast'
-            buildConfig['nodeType'] = 'fast && italia'
+            buildConfig['nodeType'] = 'navtest-fast && italia'
             break;
         case "slow-build":
             buildConfig['testSuite'] = 'jenkins_slow'
-            buildConfig['nodeType'] = 'slow && italia'
+            buildConfig['nodeType'] = 'navtest-slow && italia'
             break;
 
         case "fast-build-asr":
@@ -51,15 +51,6 @@ static def getBuildConfig(jobName) {
         case "slow-build-asr":
             buildConfig['testSuite'] = 'jenkins_asr_slow'
             buildConfig['nodeType'] = 'asr'
-            break;
-
-        case "fast-build-michi":
-            buildConfig['testSuite'] = 'jenkins_michi_fast'
-            buildConfig['nodeType'] = 'fast && italia'
-            break;
-        case "slow-build-michi":
-            buildConfig['testSuite'] = 'jenkins_michi_slow'
-            buildConfig['nodeType'] = 'slow && italia'
             break;
     }
 

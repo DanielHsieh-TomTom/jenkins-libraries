@@ -181,3 +181,8 @@ static def addNodeNameToBuildSummary(nodeName, manager) {
 static def addArtifactLink(manager, label, artifactLink, artifactName) {
     manager.createSummary("clipboard.png").appendText("${label}: <a href=\"${artifactLink}\" target=\"_blank\">${artifactName}</a>", false, false, false, "#333333")
 }
+
+@NonCPS
+static def getDescriptionOfLastSuccessfulBuild(jobName) {
+    return Jenkins.instance.getItem(jobName).getLastSuccessfulBuild().description
+}

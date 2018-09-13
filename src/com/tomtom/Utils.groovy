@@ -186,3 +186,10 @@ static def addArtifactLink(manager, label, artifactLink, artifactName) {
 static def getDescriptionOfLastSuccessfulBuild(jobName) {
     return Jenkins.instance.getItem(jobName).getLastSuccessfulBuild().description
 }
+
+@NonCPS
+static def readProperties(content) {
+    Properties properties = new Properties()
+    properties.load(new StringReader(content))
+    return properties
+}

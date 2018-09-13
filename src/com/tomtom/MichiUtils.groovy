@@ -108,7 +108,7 @@ private def parseMichiBuilds(content) {
     def jsonSlurper = new JsonSlurper()
     def json = jsonSlurper.parseText(content)
 
-    def pattern = /^Michi: CL#([0-9]+), NavKit: (.*)$/
+    def pattern = /^Michi: CL#([0-9]+), NavKit: (\d+\.\d+\.\d+(?:-\d+\.\d+)?)/
 
     return json.builds.stream().map {
         it.description

@@ -61,6 +61,38 @@ private static def getMichiVersions(architectures) {
 }
 
 @NonCPS
+static def getNavKitVersion(michiVersion) {
+    def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
+    def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
+
+    def path = "com.tomtom.navkit.map/TomTom.NavKit.Map.Sdk.Android.aar/android/armeabi-v7a/release/$michiVersion"
+    def name = "TomTom.NavKit.Map.Sdk.Android.aar-android-armeabi-v7a-release-custom-*"
+
+    def body = """items.find({
+    "repo": {"\$eq":"michi-release-local"},
+    "path": {"\$match":"$path"},
+    "name": {"\$match":"$name"}
+    }).include("property")"""
+
+    def connection = url.openConnection()
+    connection.setRequestMethod("POST")
+    connection.setRequestProperty("Authorization", authorization)
+    connection.setRequestProperty("Content-Type", "text/plain")
+    connection.doOutput = true
+
+    def writer = new OutputStreamWriter(connection.outputStream)
+    writer.write(body)
+    writer.flush()
+    writer.close()
+    connection.connect()
+
+    def jsonSlurper = new JsonSlurper()
+    def json = jsonSlurper.parseText(connection.content.text)
+
+    return json.results[0]?.properties?.find { it.key == "Michi.NavKitVersion" }?.value
+}
+
+@NonCPS
 static def getLatestVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
@@ -123,6 +155,12 @@ private def parseMichiBuilds(content) {
 }
 
 def getNavKitVersion(branch, michiVersion) {
+    // Try AQL first
+    def aqlVersion = getNavKitVersion(michiVersion)
+    if (aqlVersion != null) {
+        return aqlVersion
+    }
+
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
     def jobName = ""
     switch (branch) {

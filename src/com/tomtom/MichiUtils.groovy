@@ -18,6 +18,11 @@ import javax.net.ssl.HttpsURLConnection
 
 @NonCPS
 private static def getMichiVersions(architectures) {
+    return getMichiVersions(architectures, null)
+}
+
+@NonCPS
+private static def getMichiVersions(architectures, navkitVersion) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
     def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
 
@@ -25,10 +30,17 @@ private static def getMichiVersions(architectures) {
         def path = "com.tomtom.navkit.map/TomTom.NavKit.Map.Sdk.Android.aar/android/${architecture}/release/*"
         def name = "TomTom.NavKit.Map.Sdk.Android.aar-android-${architecture}-release-custom-*"
 
+        def navkitVersionBody = ""
+        if (navkitVersion != null) {
+            navkitVersionBody = """,
+"@Michi.NavKitVersion": {"\$eq":"$navkitVersion"}
+"""
+        }
+
         def body = """items.find({
 "repo": {"\$eq":"michi-release-local"},
 "path": {"\$match":"$path"},
-"name": {"\$match":"$name"}
+"name": {"\$match":"$name"}$navkitVersionBody
 })"""
 
         def connection = url.openConnection()
@@ -94,6 +106,11 @@ static def getNavKitVersion(michiVersion) {
 
 @NonCPS
 static def getLatestVersion(branch) {
+    return getLatestVersion(branch, null)
+}
+
+@NonCPS
+static def getLatestVersion(branch, navkitVersion) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
     // Determine architectures and version pattern
@@ -114,7 +131,7 @@ static def getLatestVersion(branch) {
     }
 
     // Get all versions
-    def versions = getMichiVersions(architectures)
+    def versions = getMichiVersions(architectures, navkitVersion)
 
     // Sort versions based on pattern
     def sortedVersions = versions.stream()
@@ -122,6 +139,11 @@ static def getLatestVersion(branch) {
         .collect().sort { (it =~ /${versionPattern}/)[0][1] }
 
     return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
+}
+
+@NonCPS
+static def getLatestVersionWithSpecificNavKit(branch, navkitVersion) {
+    def latestVersions = getLatestVersion()
 }
 
 @NonCPS

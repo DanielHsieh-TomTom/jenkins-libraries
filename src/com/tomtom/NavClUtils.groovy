@@ -89,3 +89,12 @@ static def doesVersionExist(version) {
 
     return found
 }
+
+@NonCPS
+static def getNavKitVersion(navclVersion) {
+    def commit = navclVersion[-8..-1]
+    def url = "https://bitbucket.tomtomgroup.com/projects/NAVCL/repos/navcl-team/raw/Source/navkit_version.properties?at=${commit}".toURL()
+    def props = new Properties()
+    props.load(new StringReader(url.getText()))
+    return props["navkitVersion"]
+}

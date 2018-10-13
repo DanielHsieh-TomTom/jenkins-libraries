@@ -3,6 +3,7 @@ package com.tomtom;
 import java.nio.file.Paths
 import hudson.BulkChange;
 import hudson.tasks.LogRotator;
+import hudson.model.Result;
 
 @NonCPS
 static def getP4Changelist(build) {
@@ -192,4 +193,9 @@ static def readProperties(content) {
     Properties properties = new Properties()
     properties.load(new StringReader(content))
     return properties
+}
+
+@NonCPS
+static def setResult(currentBuild, result) {
+    currentBuild.build().@result = Result.fromString(result)
 }

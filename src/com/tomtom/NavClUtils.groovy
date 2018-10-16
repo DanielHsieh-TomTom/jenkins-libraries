@@ -48,9 +48,16 @@ private static def getNavClVersions(architectures) {
 
 @NonCPS
 static def getLatestVersion(branch) {
+    def branchReleasePattern = /^rel-(\d\d\.\d)$/
+
     def nightlyPattern = /^nightly_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
+    def releasePattern = /^(\d\d(?:\.\d)+)\.[a-z]+_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
 
     def architectures = ['armeabi-v7a']
+    if (branch ==~ branchReleasePattern) {
+        architectures = ['armeabi-v7a', 'x86_64']
+    }
+
     def versions = getNavClVersions(architectures)
 
     def sortedVersions = []
@@ -72,8 +79,39 @@ static def getLatestVersion(branch) {
                 }
                 return 0
             }
-    } else {
-        // TODO: add release branch support
+    } else if (branch ==~ branchReleasePattern) {
+        def majorVersion = (branch =~ branchReleasePattern)[0][1]
+
+        sortedVersions = versions.stream()
+            .filter { it ==~ releasePattern && it.startsWith(majorVersion) }
+            .collect().sort { l, r ->
+                def leftMatcher = l =~ releasePattern
+                def rightMatcher = r =~ releasePattern
+
+                def leftVersionParts = leftMatcher[0][1].split(/\./)
+                def rightVersionParts = rightMatcher[0][1].split(/\./)
+
+                // Sort based on version
+                for (int i=0;i<4;i++) {
+                    def leftValue = (leftVersionParts.size() >= i+1) ? leftVersionParts[i] as Integer : 0
+                    def rightValue = (rightVersionParts.size() >= i+1) ? rightVersionParts[i] as Integer : 0
+
+                    if (leftValue != rightValue) {
+                        return leftValue <=> rightValue
+                    }
+                }
+
+                // Sort based on date
+                for (int i = 2; i < 5 ; i++) {
+                    def left = leftMatcher[0][i].toInteger()
+                    def right = rightMatcher[0][i].toInteger()
+                    if (left != right) {
+                        return left <=> right
+                    }
+                }
+
+                return 0
+            }
     }
 
     return (sortedVersions.isEmpty()) ? null : sortedVersions.last()

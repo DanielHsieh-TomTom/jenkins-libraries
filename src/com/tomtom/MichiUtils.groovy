@@ -197,7 +197,7 @@ def getNavKitVersion(branch, michiVersion) {
             return null
     }
 
-    def response = httpRequest(url: "https://michi-infinity.tomtomgroup.com/job/${jobName}/MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=ubuntu_host/api/json?tree=builds[description]", ignoreSslErrors: true)
+    def response = httpRequest(url: "https://michi-infinity.tomtomgroup.com/job/${jobName}/MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=osx_android_host/api/json?tree=builds[description]", ignoreSslErrors: true)
     def content = response.content
 
     def michiNavKitVersionMap = parseMichiBuilds(content)

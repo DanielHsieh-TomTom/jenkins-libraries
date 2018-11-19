@@ -97,7 +97,7 @@ static def doHttpGetWithBasicAuthentication(urlString, credentialId) {
     StringBuilder builder = new StringBuilder();
     def reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))
     while ((line = reader.readLine()) != null) {
-        builder.append(line);
+        builder.append(line).append("\n");
     }
     reader.close()
     return builder.toString();
@@ -198,4 +198,13 @@ static def readProperties(content) {
 @NonCPS
 static def setResult(currentBuild, result) {
     currentBuild.build().@result = Result.fromString(result)
+}
+
+@NonCPS
+static def getCurrentDependencyVersion(dependency, branch) {
+    def url = "https://bitbucket.tomtomgroup.com/projects/NAVAPP/repos/navui-main/raw/Build/versions.properties?at=refs%2Fheads%2F${branch}"
+    def versionsContent = doHttpGetWithBasicAuthentication(url, 'svc_navuibuild')
+    def props = new Properties()
+    props.load(new StringReader(versionsContent))
+    return props[dependency]
 }

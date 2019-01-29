@@ -44,15 +44,6 @@ static def getBuildConfig(jobName) {
             buildConfig['testSuite'] = 'jenkins_slow'
             buildConfig['nodeType'] = 'navtest-slow && italia'
             break;
-
-        case "fast-build-asr":
-            buildConfig['testSuite'] = 'jenkins_asr_fast'
-            buildConfig['nodeType'] = 'asr'
-            break;
-        case "slow-build-asr":
-            buildConfig['testSuite'] = 'jenkins_asr_slow'
-            buildConfig['nodeType'] = 'asr'
-            break;
     }
 
     return buildConfig
@@ -105,7 +96,7 @@ static def doHttpGetWithBasicAuthentication(urlString, credentialId) {
 
 @NonCPS
 static def fixMultiBranchJobProperties() {
-    def rootJobs = ['slow-build', 'fast-build', 'fast-build-asr']
+    def rootJobs = ['slow-build', 'fast-build']
     Jenkins.instance.items.stream().filter { rootJob ->
         rootJob.name in rootJobs
     }.each { rootJob ->

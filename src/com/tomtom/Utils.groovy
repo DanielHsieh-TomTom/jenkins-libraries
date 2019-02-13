@@ -34,15 +34,23 @@ static def getBuildConfig(jobName) {
     // Determine branch name
     buildConfig['branchName'] = URLDecoder.decode(jobName.substring(jobName.indexOf('/') + 1))
 
-    // Determine test-suite and node-type
+    // Determine suite, node-type, timeout and emulator-count
+    buildConfig['emulatorCount'] = 0
+    buildConfig['timeout'] = 1
     switch (buildConfig['rootJob']) {
         case "fast-build":
-            buildConfig['testSuite'] = 'jenkins_fast'
+            buildConfig['testSuite'] = 'runFastSuite'
             buildConfig['nodeType'] = 'navtest-fast && italia'
             break;
         case "slow-build":
-            buildConfig['testSuite'] = 'jenkins_slow'
+            buildConfig['testSuite'] = 'runSlowSuite'
             buildConfig['nodeType'] = 'navtest-slow && italia'
+            buildConfig['timeout'] = 4
+            break;
+        case "emulator-build":
+            buildConfig['testSuite'] = 'runEmulatorSuite'
+            buildConfig['nodeType'] = 'emulator'
+            buildConfig['emulatorCount'] = 5
             break;
     }
 

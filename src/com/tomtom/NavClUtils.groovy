@@ -51,7 +51,7 @@ static def getLatestVersion(branch) {
     def branchReleasePattern = /^rel-(\d\d\.\d)$/
 
     def nightlyPattern = /^nightly_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
-    def releasePattern = /^(\d\d(?:\.\d)+)\.[a-z]+_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
+    def releasePattern = /^(\d\d(?:\.\d)+)\.?[a-z]+_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
 
     def architectures = ['armeabi-v7a']
     if (branch ==~ branchReleasePattern) {

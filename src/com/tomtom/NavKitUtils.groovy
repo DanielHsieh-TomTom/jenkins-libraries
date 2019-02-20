@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
 @NonCPS
 private static def getNavKitVersions(architectures) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
-    def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
+    def url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/aql")
 
     def versionLists = architectures.stream().map { architecture ->
         def path = "com.tomtom/NavKit.FOR.NDS/android/${architecture}/release/*"
@@ -92,7 +92,7 @@ static def getLatestVersion(branch) {
 
 @NonCPS
 static def doesVersionExist(version) {
-    URL url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.navui.navkit&a=NavKitNDS")
+    URL url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.navui.navkit&a=NavKitNDS")
 
     def found = new groovy.json.JsonSlurper().parseText(url.text).results.find { result ->
       result.version == version

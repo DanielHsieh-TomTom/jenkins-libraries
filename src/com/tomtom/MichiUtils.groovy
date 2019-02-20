@@ -24,7 +24,7 @@ private static def getMichiVersions(architectures) {
 @NonCPS
 private static def getMichiVersions(architectures, navkitVersion) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
-    def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
+    def url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/aql")
 
     def versionLists = architectures.stream().map { architecture ->
         def path = "com.tomtom.navkit.map/TomTom.NavKit.Map.Sdk.Android.aar/android/${architecture}/release/*"
@@ -75,7 +75,7 @@ private static def getMichiVersions(architectures, navkitVersion) {
 @NonCPS
 static def getNavKitVersion(michiVersion) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
-    def url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/aql")
+    def url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/aql")
 
     def path = "com.tomtom.navkit.map/TomTom.NavKit.Map.Sdk.Android.aar/android/armeabi-v7a/release/$michiVersion"
     def name = "TomTom.NavKit.Map.Sdk.Android.aar-android-armeabi-v7a-release-custom-*"
@@ -148,7 +148,7 @@ static def getLatestVersionWithSpecificNavKit(branch, navkitVersion) {
 
 @NonCPS
 static def doesVersionExist(version) {
-    URL url = new URL("http://artifactory-ci.tomtomgroup.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.navui.michi&a=TomTomNavKitMapSdk")
+    URL url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/versions?repos=navapp-releases&g=com.tomtom.navui.michi&a=TomTomNavKitMapSdk")
 
     def found = new groovy.json.JsonSlurper().parseText(url.text).results.find { result ->
       result.version == version

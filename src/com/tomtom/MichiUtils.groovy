@@ -185,10 +185,14 @@ def getNavKitVersion(branch, michiVersion) {
 
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
     def jobName = ""
+    def michiNode = "osx_android_host"
     switch (branch) {
         case "main":
             jobName = "main-michi-android"
             break;
+        case "rel-18.3":
+            michiNode = "osx_android4"
+            // fall-through
         case ~/$releaseBranchPattern/:
             def matcher = branch =~ /$releaseBranchPattern/
             jobName = "rel-${matcher[0][1]}.${matcher[0][2]}-michi-android"
@@ -197,7 +201,7 @@ def getNavKitVersion(branch, michiVersion) {
             return null
     }
 
-    def response = httpRequest(url: "https://michi-infinity.tomtomgroup.com/job/${jobName}/MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=osx_android_host/api/json?tree=builds[description]", ignoreSslErrors: true)
+    def response = httpRequest(url: "https://michi-infinity.tomtomgroup.com/job/${jobName}/MICHI_GENERATOR=Make,MICHI_MODE=Release,MICHI_NODE=$michiNode/api/json?tree=builds[description]", ignoreSslErrors: true)
     def content = response.content
 
     def michiNavKitVersionMap = parseMichiBuilds(content)

@@ -116,9 +116,28 @@ static def getLatestVersion(branch, navkitVersion) {
     // Determine architectures and version pattern
     def architectures = ["armeabi-v7a", "x86_64"]
     def versionPattern = ""
+    def comparator= { a, b -> a <=> b }
     switch (branch) {
         case "main":
-            versionPattern = "^([0-9]+)\$"
+            versionPattern = "^(([0-9]+)|([0-9]{8}\\.[0-9]{6}))\$"
+
+            def oldVersionPattern = "^([0-9]+)\$"
+            def newVersionPattern = "^([0-9]{8}\\.[0-9]{6})\$"
+
+            comparator = { a, b ->
+                def aNew = a ==~ newVersionPattern
+                def bNew = b ==~ newVersionPattern
+
+                if (aNew && !bNew) {
+                    return 1
+                } else if (!aNew && bNew) {
+                    return -1
+                } else if (!aNew && !bNew) {
+                    return a <=> b
+                } else {
+                    return a.replace('.', '') <=> b.replace('.', '')
+                }
+            }
             break;
         case "rel-17.6":
             architectures = ["armeabi-v7a"]
@@ -136,7 +155,7 @@ static def getLatestVersion(branch, navkitVersion) {
     // Sort versions based on pattern
     def sortedVersions = versions.stream()
         .filter { it ==~ versionPattern }
-        .collect().sort { (it =~ /${versionPattern}/)[0][1] }
+        .collect().sort(comparator)
 
     return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
 }

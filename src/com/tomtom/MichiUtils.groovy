@@ -149,10 +149,10 @@ static def getLatestVersion(branch, navkitVersion) {
         case "rel-18.4":
         case "rel-18.5":
         case "rel-18.6":
-        case "rel-19.1":
             def matcher = branch =~ /$releaseBranchPattern/
             versionPattern = "^([0-9]+)-${matcher[0][1]}\\.${matcher[0][2]}\$"
             break;
+        case "rel-19.1":
         case ~/$releaseBranchPattern/:
             versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
             comparator = { a, b ->

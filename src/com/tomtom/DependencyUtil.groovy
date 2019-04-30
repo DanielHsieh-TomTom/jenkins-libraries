@@ -105,14 +105,17 @@ static def getLatestNavKitVersion(branch) {
 static def getLatestMichiVersion(branch) {
     def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
 
+    def versionPattern
     def comparator
     switch (branch) {
         case "main":
+            versionPattern = "^([0-9]+)\\.([0-9]+)\$"
             comparator = { a, b ->
                 return a.replace('.', '') <=> b.replace('.', '')
             }
             break
         case ~/$releaseBranchPattern/:
+            versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
             comparator = { a, b ->
                 def aInt = a.substring(8).replace('.', '')
                 def bInt = b.substring(8).replace('.', '')

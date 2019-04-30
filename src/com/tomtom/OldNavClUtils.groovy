@@ -2,6 +2,15 @@ package com.tomtom;
 
 import groovy.json.JsonSlurper
 
+/**
+ * !!!!!!!!!!!!!!!!!!!!!!
+ * !!!!! DEPRECATED !!!!!
+ * !!!!!!!!!!!!!!!!!!!!!!
+ *
+ * These utility methods apply to the old republished NavCl artifacts.
+ * Use DependencyUtil for new artifacts
+ */
+
 @NonCPS
 private static def getNavClVersions(architectures) {
     def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="

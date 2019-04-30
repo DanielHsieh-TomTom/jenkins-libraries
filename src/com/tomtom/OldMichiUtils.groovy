@@ -16,6 +16,15 @@ import javax.net.ssl.X509TrustManager
 import javax.net.ssl.SSLContext
 import javax.net.ssl.HttpsURLConnection
 
+/**
+ * !!!!!!!!!!!!!!!!!!!!!!
+ * !!!!! DEPRECATED !!!!!
+ * !!!!!!!!!!!!!!!!!!!!!!
+ *
+ * These utility methods apply to the old republished Michi artifacts.
+ * Use DependencyUtil for new artifacts
+ */
+
 @NonCPS
 private static def getMichiVersions(architectures) {
     return getMichiVersions(architectures, null)

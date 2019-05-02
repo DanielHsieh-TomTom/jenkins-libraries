@@ -13,15 +13,18 @@ static def getP4Changelist(build) {
 }
 
 @NonCPS
-static def getRevisionHashes(build) {
-    def hashes = []
-    def scmAction = build.getRawBuild().actions.stream().find { action ->
-        action instanceof jenkins.scm.api.SCMRevisionAction
+static def getRevisionHash(build, scm) {
+    if (scm.buildChooser instanceof jenkins.plugins.git.AbstractGitSCMSource.SpecificRevisionBuildChooser) {
+        return scm.buildChooser.revision.sha1String
     }
-    if (scmAction != null) {
-        hashes += scmAction.revision.hash
+
+    def buildData = build.rawBuild.actions.stream().find { action ->
+        action instanceof hudson.plugins.git.util.BuildData
     }
-    return hashes
+    if (buildData != null) {
+        return buildData.lastBuiltRevision.sha1String
+    }
+    return null
 }
 
 @NonCPS

@@ -33,7 +33,7 @@ static def getBuildConfig(env, jobName) {
 
     if (jobName == "custom-fast-build" || jobName == "custom-slow-build") {
         buildConfig['rootJob'] = jobName
-        buildConfig['branchName'] = env.BRANCH
+        buildConfig['branchName'] = "${env.BRANCH}-custom"
     } else {
         // Determine root-job name
         buildConfig['rootJob'] = URLDecoder.decode(jobName.substring(0, jobName.indexOf('/')))

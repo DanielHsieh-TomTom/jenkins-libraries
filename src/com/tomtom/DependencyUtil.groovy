@@ -47,6 +47,42 @@ private static def getVersions(path, name) {
     }.collect()
 }
 
+/**
+ * Returns the latest version from the list for the given branch
+ */
+@NonCPS
+private static def getLatestVersion(branch, versions) {
+    def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
+
+    def versionPattern
+    def comparator
+    switch (branch) {
+        case "main":
+            versionPattern = "^([0-9]+)\\.([0-9]+)\$"
+            comparator = { a, b ->
+                return a.replace('.', '') <=> b.replace('.', '')
+            }
+            break
+        case ~/$releaseBranchPattern/:
+            versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
+            comparator = { a, b ->
+                def aInt = a.substring(8).replace('.', '')
+                def bInt = b.substring(8).replace('.', '')
+                return a <=> b
+            }
+            break
+        default:
+            return null
+    }
+
+    // Sort versions based on pattern
+    def sortedVersions = versions.stream()
+        .filter { it ==~ versionPattern }
+        .collect().sort(comparator)
+
+    return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
+}
+
 @NonCPS
 private static def getNavKitVersions() {
     return getVersions("com/tomtom/navkit/android/NavKitService/*", "NavKitService*.aar")
@@ -103,102 +139,10 @@ static def getLatestNavKitVersion(branch) {
 
 @NonCPS
 static def getLatestMichiVersion(branch) {
-    def releaseBranchPattern = "^rel-([0-9]+)\\.([0-9]+)\$"
-
-    def versionPattern
-    def comparator
-    switch (branch) {
-        case "main":
-            versionPattern = "^([0-9]+)\\.([0-9]+)\$"
-            comparator = { a, b ->
-                return a.replace('.', '') <=> b.replace('.', '')
-            }
-            break
-        case ~/$releaseBranchPattern/:
-            versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
-            comparator = { a, b ->
-                def aInt = a.substring(8).replace('.', '')
-                def bInt = b.substring(8).replace('.', '')
-                return a <=> b
-            }
-            break
-        default:
-            return null
-    }
-
-    // Get all versions
-    def versions = getMichiVersions()
-
-    // Sort versions based on pattern
-    def sortedVersions = versions.stream()
-        .filter { it ==~ versionPattern }
-        .collect().sort(comparator)
-
-    return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
+    return getLatestVersion(branch, getMichiVersions())
 }
 
 @NonCPS
 static def getLatestNavClVersion(branch) {
-    def branchReleasePattern = /^rel-(\d\d\.\d)$/
-
-    def nightlyPattern = /^nightly_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
-    def releasePattern = /^(\d\d(?:\.\d)+)\.?[a-z]+_([0-9]{4})_([0-9]{2})_([0-9]{2})\.(.*)$/
-
-    def versions = getNavClVersions()
-
-    def sortedVersions = []
-
-    if (branch == 'main') {
-        sortedVersions = versions.stream()
-            .filter { it ==~ nightlyPattern }
-            .collect().sort { l, r ->
-                def leftMatcher = l =~ nightlyPattern
-                def rightMatcher = r =~ nightlyPattern
-
-                def i = 0
-                for (i = 1; i < 4 ; i++) {
-                    def left = leftMatcher[0][i].toInteger()
-                    def right = rightMatcher[0][i].toInteger()
-                    if (left != right) {
-                        return left <=> right
-                    }
-                }
-                return 0
-            }
-    } else if (branch ==~ branchReleasePattern) {
-        def majorVersion = (branch =~ branchReleasePattern)[0][1]
-
-        sortedVersions = versions.stream()
-            .filter { it ==~ releasePattern && it.startsWith(majorVersion) }
-            .collect().sort { l, r ->
-                def leftMatcher = l =~ releasePattern
-                def rightMatcher = r =~ releasePattern
-
-                def leftVersionParts = leftMatcher[0][1].split(/\./)
-                def rightVersionParts = rightMatcher[0][1].split(/\./)
-
-                // Sort based on version
-                for (int i=0;i<4;i++) {
-                    def leftValue = (leftVersionParts.size() >= i+1) ? leftVersionParts[i] as Integer : 0
-                    def rightValue = (rightVersionParts.size() >= i+1) ? rightVersionParts[i] as Integer : 0
-
-                    if (leftValue != rightValue) {
-                        return leftValue <=> rightValue
-                    }
-                }
-
-                // Sort based on date
-                for (int i = 2; i < 5 ; i++) {
-                    def left = leftMatcher[0][i].toInteger()
-                    def right = rightMatcher[0][i].toInteger()
-                    if (left != right) {
-                        return left <=> right
-                    }
-                }
-
-                return 0
-            }
-    }
-
-    return (sortedVersions.isEmpty()) ? null : sortedVersions.last()
+    return getLatestVersion(branch, getNavClVersions())
 }

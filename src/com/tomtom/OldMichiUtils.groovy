@@ -150,18 +150,7 @@ static def getLatestVersion(branch, navkitVersion) {
             break;
         case "rel-17.6":
             architectures = ["armeabi-v7a"]
-            versionPattern = "^rel-17\\.6-([0-9]+)\$"
-            break;
-        case "rel-18.1":
-        case "rel-18.2":
-        case "rel-18.3":
-        case "rel-18.4":
-        case "rel-18.5":
-        case "rel-18.6":
-            def matcher = branch =~ /$releaseBranchPattern/
-            versionPattern = "^([0-9]+)-${matcher[0][1]}\\.${matcher[0][2]}\$"
-            break;
-        case "rel-19.1":
+            // fall-through
         case ~/$releaseBranchPattern/:
             versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
             comparator = { a, b ->

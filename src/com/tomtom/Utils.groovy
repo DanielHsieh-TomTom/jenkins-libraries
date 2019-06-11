@@ -68,6 +68,76 @@ static def getBuildConfig(env, jobName) {
 }
 
 @NonCPS
+static def getSlackConfig(env, currentBuild, rootJob, branchName) {
+    def slackConfig = [:]
+    slackConfig['mode'] = 'never'
+
+    // Determine the mode and credentialId
+    switch (rootJob) {
+        case "fast-build":
+            switch (branchName) {
+                case "canary":
+                    slackConfig['mode'] = 'on-change-or-failure'
+                    slackConfig['credentialId'] = 'slack_token_private'
+                    break;
+                case "develop":
+                    slackConfig['mode'] = 'on-change-or-failure'
+                    slackConfig['credentialId'] = 'slack_token'
+                    break;
+            }
+            break;
+        case "slow-build":
+            switch (branchName) {
+                case "canary":
+                    slackConfig['mode'] = 'on-change-or-failure'
+                    slackConfig['credentialId'] = 'slack_token_private'
+                    break;
+                case "develop":
+                    slackConfig['mode'] = 'on-change-or-failure'
+                    slackConfig['credentialId'] = 'slack_token'
+                    break;
+            }
+            break;
+    }
+
+    // Check results
+    def passed = currentBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS.toString())
+    def previousPassed = currentBuild.previousBuild == null || currentBuild.previousBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS.toString())
+
+    // Determine whether to notify
+    slackConfig['notify'] = false
+    switch (slackConfig['mode']) {
+        case "on-change":
+            slackConfig['notify'] = passed != previousPassed
+            break;
+        case "on-failure":
+            slackConfig['notify'] = !passed
+            break;
+        case "on-change-or-failure":
+            slackConfig['notify'] = passed != previousPassed || !passed
+            break;
+        case "never":
+            slackConfig['notify'] = false
+            break;
+    }
+
+    if (slackConfig['notify']) {
+        // Determine message
+        if (!passed && previousPassed) {
+            slackConfig['message'] = "Build failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        } else if (passed && !previousPassed) {
+            slackConfig['message'] = "Build back to normal - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        } else if (!passed && !previousPassed) {
+            slackConfig['message'] = "Build still failing - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        } else {
+            slackConfig['message'] = "Build passed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+    }
+
+    return slackConfig
+}
+
+@NonCPS
 private static def getCredentials(credentialId) {
     def cred = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
             com.cloudbees.plugins.credentials.common.StandardUsernameCredentials.class,

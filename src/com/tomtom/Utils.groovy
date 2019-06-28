@@ -202,24 +202,16 @@ static def fixMultiBranchJobProperties() {
 private static def configureBuildRetention(job) {
     def setStrategy = true
     def daysToKeep = -1
-    def numToKeep = 10
-    def artifactDaysToKeep = -1
-    def artifactNumToKeep = -1
+    def numToKeep = -1
+    def artifactDaysToKeep = 60
+    def artifactNumToKeep = 10
 
     def branchName = URLDecoder.decode(job.name)
     switch (branchName) {
         case "develop":
-            // Keep develop builds for 365 days
-            daysToKeep = 365
-            numToKeep = -1
-            break
         case ~/rel-[0-9]{2}\.[0-9]/:
-            // Keep all builds for release branches
+            // Keep all builds for develop & release branches
             setStrategy = false
-            break;
-        case "navkit-canary":
-            // Keep 365 builds for the canary branch
-            numToKeep = 365
             break;
         default:
             break;

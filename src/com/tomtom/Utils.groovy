@@ -62,6 +62,10 @@ static def getBuildConfig(env, jobName) {
             buildConfig['nodeType'] = 'emulator'
             buildConfig['emulatorCount'] = 5
             break;
+        case "korea-build":
+            buildConfig['testSuite'] = 'runKoreaSuite'
+            buildConfig['nodeType'] = 'korea'
+            break;
     }
 
     return buildConfig

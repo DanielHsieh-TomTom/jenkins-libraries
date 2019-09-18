@@ -217,6 +217,9 @@ private static def configureBuildRetention(job) {
             // Keep all builds for develop & release branches
             setStrategy = false
             break;
+        case "canary":
+            artifactNumToKeep = 50
+            break;
         default:
             break;
     }

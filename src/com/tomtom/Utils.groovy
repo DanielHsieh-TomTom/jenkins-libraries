@@ -29,6 +29,11 @@ static def getRevisionHash(build, scm) {
 
 @NonCPS
 static def getBuildConfig(env, jobName) {
+    return getBuildConfig(env, jobName, false)
+}
+
+@NonCPS
+static def getBuildConfig(env, jobName, useEmulators) {
     def buildConfig = [:]
 
     if (jobName == "custom-fast-build" || jobName == "custom-slow-build") {
@@ -50,17 +55,20 @@ static def getBuildConfig(env, jobName) {
         case "custom-fast-build":
             buildConfig['testSuite'] = 'runFastSuite'
             buildConfig['nodeType'] = 'navtest-fast && italia'
+            if (useEmulators) {
+                buildConfig['emulatorCount'] = 10
+                buildConfig['nodeType'] = 'navtest-fast && emulator'
+            }
             break;
         case "slow-build":
         case "custom-slow-build":
             buildConfig['testSuite'] = 'runSlowSuite'
             buildConfig['nodeType'] = 'navtest-slow && italia'
             buildConfig['timeout'] = 4
-            break;
-        case "emulator-build":
-            buildConfig['testSuite'] = 'runEmulatorSuite'
-            buildConfig['nodeType'] = 'emulator'
-            buildConfig['emulatorCount'] = 5
+            if (useEmulators) {
+                buildConfig['emulatorCount'] = 25
+                buildConfig['nodeType'] = 'navtest-slow && emulator'
+            }
             break;
         case "korea-build":
             buildConfig['testSuite'] = 'runKoreaSuite'

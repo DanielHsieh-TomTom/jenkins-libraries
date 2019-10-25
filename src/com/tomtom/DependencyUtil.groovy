@@ -22,7 +22,7 @@ private static def getVersions(path, name) {
     def url = new URL("http://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/aql")
 
     def body = """items.find({
-"repo": { "\$eq": "navkit-maven" },
+"\$or":[{"repo":{"\$eq":"navkit-maven"}}, {"repo":{"\$eq":"nav-maven-release"}}],
 "path": { "\$match": "$path" },
 "name": { "\$match": "$name" }
 })"""

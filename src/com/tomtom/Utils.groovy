@@ -3,7 +3,10 @@ package com.tomtom;
 import java.nio.file.Paths
 import hudson.BulkChange;
 import hudson.tasks.LogRotator;
+import hudson.model.AbstractProject
+import hudson.tasks.Mailer
 import hudson.model.Result;
+import hudson.model.User
 
 @NonCPS
 static def getP4Changelist(build) {
@@ -147,6 +150,38 @@ static def getSlackConfig(env, currentBuild, rootJob, branchName) {
     }
 
     return slackConfig
+}
+
+@NonCPS
+static def getEmailConfig(env, currentBuild) {
+    // Determine email address
+    def buildUserId = currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+    def buildUser = User.get(buildUserId)
+    def emailAddress = buildUser.getProperty(Mailer.UserProperty.class).getAddress()
+
+    def emailConfig = [:]
+    emailConfig["from"] = "NavUI Jenkins <noreply@navui-jenkins.ttg.global>"
+    emailConfig["mimeType"] = "text/html"
+    emailConfig["to"] = emailAddress
+
+    // Check results
+    def passed = currentBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS.toString())
+    def previousPassed = currentBuild.previousBuild == null || currentBuild.previousBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS.toString())
+
+    def status = (passed) ? "PASSED" : "FAILED"
+    def statusDetails = ""
+    def jobName = URLDecoder.decode(env.JOB_NAME)
+    def buildNumber = env.BUILD_NUMBER
+    if (passed && !previousPassed) {
+        statusDetails = "back to normal"
+    } else if (!passed && !previousPassed) {
+        statusDetails = "still failing"
+    }
+
+    emailConfig['subject'] = "[$status] Build $statusDetails: $jobName #$buildNumber"
+    emailConfig["message"] = "Build $statusDetails - <a href=\"${env.BUILD_URL}\">$jobName #$buildNumber</a>"
+
+    return emailConfig
 }
 
 @NonCPS

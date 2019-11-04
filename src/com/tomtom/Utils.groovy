@@ -86,6 +86,9 @@ static def getBuildConfig(env, jobName, useEmulators) {
 static def getSlackConfig(env, currentBuild, rootJob, branchName) {
     def slackConfig = [:]
     slackConfig['mode'] = 'never'
+    slackConfig['user'] = null
+
+    def buildUser = User.get(currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId())
 
     // Determine the mode and credentialId
     switch (rootJob) {
@@ -111,6 +114,11 @@ static def getSlackConfig(env, currentBuild, rootJob, branchName) {
                     slackConfig['mode'] = 'on-change-or-failure'
                     slackConfig['credentialId'] = 'slack_token'
                     break;
+                default:
+                    if (!buildUser.getProperty(jenkins.plugins.slack.user.SlackUserProperty.class).disableNotifications) {
+                        slackConfig['mode'] = 'on-change-or-failure'
+                        slackConfig['user'] = buildUser.getId()
+                    }
             }
             break;
     }
@@ -176,6 +184,8 @@ static def getEmailConfig(env, currentBuild) {
         statusDetails = "back to normal"
     } else if (!passed && !previousPassed) {
         statusDetails = "still failing"
+    } else if (!passed && previousPassed) {
+        statusDetails = "failed"
     }
 
     emailConfig['subject'] = "[$status] Build $statusDetails: $jobName #$buildNumber"

@@ -147,14 +147,15 @@ static def getSlackConfig(env, currentBuild, rootJob, branchName) {
     if (slackConfig['notify']) {
         // Determine message
         if (!passed && previousPassed) {
-            slackConfig['message'] = "Build failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackConfig['message'] = "Build failed"
         } else if (passed && !previousPassed) {
-            slackConfig['message'] = "Build back to normal - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackConfig['message'] = "Build back to normal"
         } else if (!passed && !previousPassed) {
-            slackConfig['message'] = "Build still failing - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackConfig['message'] = "Build still failing"
         } else {
-            slackConfig['message'] = "Build passed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackConfig['message'] = "Build passed"
         }
+        slackConfig['message'] += " - ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
     }
 
     return slackConfig

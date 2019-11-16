@@ -1,4 +1,4 @@
-package com.tomtom;
+package com.tomtom
 
 @NonCPS
 static def getPublishingInfo(jobName, buildNumber, commit) {

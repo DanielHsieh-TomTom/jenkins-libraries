@@ -28,6 +28,7 @@ static def getBuildConfig(env, jobName) {
 
     buildConfig.emulatorCount = 0
     buildConfig.timeout = 1
+    buildConfig.runBuild = true
     buildConfig.runFastSuite = true
     switch (buildConfig.rootJob) {
         case "fast-build":
@@ -43,6 +44,7 @@ static def getBuildConfig(env, jobName) {
             break;
         case "italia-build":
             buildConfig.nodeType = "navtest-fast && italia"
+            buildConfig.runBuild = false
             buildConfig.runFastSuite = false
             buildConfig.deviceSuite = "runArmOnlySuite"
             break;

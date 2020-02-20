@@ -10,6 +10,7 @@ static def getSlackConfig(env, currentBuild, rootJob, branchName) {
       "slow-build": [
         "develop": "#navand-jenkins",
         "rel-19.5": "#navand-jenkins",
+        "rel-20.1": "#navand-jenkins",
         "canary": "#navand-jenkins-builds"
       ],
       "fast-build": [

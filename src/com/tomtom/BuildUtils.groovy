@@ -32,8 +32,14 @@ static def getBuildConfig(env, jobName) {
     buildConfig.runFastSuite = true
     switch (buildConfig.rootJob) {
         case "fast-build":
-        case "custom-fast-build":
             buildConfig.nodeType = "navtest-fast"
+            break;
+        case "custom-fast-build":
+            buildConfig.nodeType = "navtest-slow"
+            break;
+        case "custom-build":
+            buildConfig.nodeType = "navtest-slow"
+            buildConfig.runFastSuite = false
             break;
         case "slow-build":
         case "custom-slow-build":

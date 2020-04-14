@@ -4,7 +4,7 @@ package com.tomtom
 static def getPublishingInfo(jobName, buildNumber, commit) {
     def publishInfo = [publish: false]
 
-    if (jobName != "custom-fast-build" && jobName != "custom-slow-build") {
+    if (jobName != "custom-build" && jobName != "custom-fast-build" && jobName != "custom-slow-build") {
         def rootJob = URLDecoder.decode(jobName.substring(0, jobName.indexOf('/')))
         def branchName = URLDecoder.decode(jobName.substring(jobName.indexOf('/') + 1))
 

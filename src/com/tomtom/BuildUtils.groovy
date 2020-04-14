@@ -18,7 +18,7 @@ static def getBuildConfig(env, jobName) {
     def buildConfig = [:]
 
     // Determine root-job and branch-name
-    if (jobName == "custom-fast-build" || jobName == "custom-slow-build") {
+    if (jobName == "custom-build" || jobName == "custom-fast-build" || jobName == "custom-slow-build") {
         buildConfig.rootJob = jobName
         buildConfig.branchName = "${env.BRANCH}-custom"
     } else {

@@ -21,6 +21,9 @@ static def getBuildConfig(env, jobName) {
     if (jobName == "custom-build" || jobName == "custom-fast-build" || jobName == "custom-slow-build") {
         buildConfig.rootJob = jobName
         buildConfig.branchName = "${env.BRANCH}-custom"
+    } else if (jobName == "japan-map-regression") {
+        buildConfig.rootJob = jobName
+        buildConfig.branchName = "japan-map-regression"
     } else {
         buildConfig.rootJob = URLDecoder.decode(jobName.substring(0, jobName.indexOf('/')))
         buildConfig.branchName = URLDecoder.decode(jobName.substring(jobName.indexOf('/') + 1))
@@ -47,6 +50,13 @@ static def getBuildConfig(env, jobName) {
             buildConfig.deviceSuite = "runSlowSuite"
             buildConfig.timeout = 2
             buildConfig.emulatorCount = 25
+            break;
+        case "japan-map-regression":
+            buildConfig.nodeType = "navtest-slow && emulator"
+            buildConfig.runFastSuite = false
+            buildConfig.deviceSuite = "runJapanSuite"
+            buildConfig.timeout = 2
+            buildConfig.emulatorCount = 10
             break;
         case "italia-build":
             buildConfig.nodeType = "navtest-fast && italia"

@@ -48,7 +48,7 @@ static def getBuildConfig(env, jobName) {
         case "custom-slow-build":
             buildConfig.nodeType = "navtest-slow && emulator"
             buildConfig.deviceSuite = "runSlowSuite"
-            buildConfig.timeout = 2
+            buildConfig.timeout = 3
             buildConfig.emulatorCount = 25
             break;
         case "japan-map-regression":

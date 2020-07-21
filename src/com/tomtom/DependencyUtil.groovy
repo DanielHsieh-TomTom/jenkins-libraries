@@ -28,6 +28,8 @@ private static def getVersions(path, name) {
 })"""
 
     def connection = url.openConnection()
+    connection.setConnectTimeout(10 * 1000)
+    connection.setReadTimeout(60 * 1000)
     connection.setRequestMethod("POST")
     connection.setRequestProperty("Authorization", authorization)
     connection.setRequestProperty("Content-Type", "text/plain")

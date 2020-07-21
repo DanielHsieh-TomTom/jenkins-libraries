@@ -36,12 +36,15 @@ private static def getBasicAuthenticationHeaderValue(credentialId) {
 
 @NonCPS
 static def doHttpGetWithBasicAuthentication(urlString, credentialId) {
-    URL url = new URL(urlString);
-    URLConnection conn = url.openConnection();
-    conn.setRequestProperty("Authorization", getBasicAuthenticationHeaderValue(credentialId));
+    def url = new URL(urlString);
+    def connection = url.openConnection();
+    connection.setConnectTimeout(10 * 1000)
+    connection.setReadTimeout(60 * 1000)
+    connection.setRequestProperty("Authorization", getBasicAuthenticationHeaderValue(credentialId));
+
     String line
     StringBuilder builder = new StringBuilder();
-    def reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))
+    def reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))
     while ((line = reader.readLine()) != null) {
         builder.append(line).append("\n");
     }

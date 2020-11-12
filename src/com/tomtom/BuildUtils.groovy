@@ -67,6 +67,9 @@ static def getBuildConfig(env, jobName) {
         case "korea-build":
             buildConfig.nodeType = "korea"
             buildConfig.deviceSuite = "runKoreaSuite"
+            buildConfig.runBuild = false
+            buildConfig.runFastSuite = false
+            buildConfig.emulatorCount = 1
             break;
     }
 

@@ -65,6 +65,7 @@ private static def getLatestVersion(branch, versions) {
                 return a.replace('.', '') <=> b.replace('.', '')
             }
             break
+        case "rel-20.3-belmonte":
         case ~/$releaseBranchPattern/:
             versionPattern = "^${branch}-([0-9]{8}\\.[0-9]{6})\$"
             comparator = { a, b ->
@@ -112,6 +113,9 @@ static def getLatestNavKitVersion(branch) {
         case ~/$releaseBranchPattern/:
             def matcher = branch =~ /$releaseBranchPattern/
             versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)-${matcher[0][1]}\\.${matcher[0][2]}\$"
+            break
+        case "rel-20.3-belmonte":
+            versionPattern = "^([0-9]+\\.[0-9]+\\.[0-9]+)-20\\.3\$"
             break
     }
 

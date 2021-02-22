@@ -1,5 +1,6 @@
 package com.tomtom;
 
+import groovy.json.JsonSlurper;
 import hudson.BulkChange;
 import hudson.tasks.LogRotator;
 import hudson.model.User
@@ -126,4 +127,15 @@ static def getCurrentDependencyVersion(dependency, branch) {
     def props = new Properties()
     props.load(new StringReader(versionsContent))
     return props[dependency]
+}
+
+@NonCPS
+static def hasOnlySingleVersionFileChange(from, to) {
+    def url = "https://bitbucket.tomtomgroup.com/rest/api/1.0/projects/NAVAPP/repos/navui-main/compare/changes?from=$from&to=$to"
+    def result = doHttpGetWithBasicAuthentication(url, 'svc_navuibuild')
+
+    def jsonSlurper = new JsonSlurper()
+    def json = jsonSlurper.parseText(result)
+
+    return json.values.size() == 1 && json.values[0].path.toString == "Build/versions.properties"
 }

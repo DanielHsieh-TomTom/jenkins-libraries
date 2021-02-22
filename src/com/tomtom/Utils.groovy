@@ -121,7 +121,7 @@ static def readProperties(content) {
 
 @NonCPS
 static def getCurrentDependencyVersion(dependency, branch) {
-    def url = "https://bitbucket.tomtomgroup.com/projects/NAVAPP/repos/navui-main/raw/Build/versions.properties?at=refs%2Fheads%2F${branch}"
+    def url = "https://bitbucket.tomtomgroup.com/projects/NAVAPP/repos/navui-main/raw/Build/versions.properties?at=${branch}"
     def versionsContent = doHttpGetWithBasicAuthentication(url, 'svc_navuibuild')
     def props = new Properties()
     props.load(new StringReader(versionsContent))

@@ -70,6 +70,7 @@ static def getBuildConfig(env, jobName) {
             buildConfig.runBuild = false
             buildConfig.runFastSuite = false
             buildConfig.emulatorCount = 1
+            buildConfig.timeout = 3
             break;
     }
 

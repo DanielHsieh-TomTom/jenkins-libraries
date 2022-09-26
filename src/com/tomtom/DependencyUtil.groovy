@@ -18,8 +18,8 @@ import javax.net.ssl.HttpsURLConnection
 
 @NonCPS
 private static def getVersions(path, name) {
-    def authorization = "Basic bmF2a2l0Ok5hdksxdCQ="
-    def url = new URL("https://artifactory.navkit-pipeline.tt3.com/artifactory/api/search/aql")
+    def authorization = "Basic c3ZjLWFyLWFzLW5rMS1wdWJsaXNoZXI6OFU3TzhFTUBDUzQleVhnSkhEMGdHcEZlQDElemM5Q0g="
+    def url = new URL("https://artifactory.tomtomgroup.com/artifactory/api/search/aql")
 
     def body = """items.find({
 "\$or":[{"repo":{"\$eq":"navkit-maven"}}, {"repo":{"\$eq":"nav-maven-release"}}],
